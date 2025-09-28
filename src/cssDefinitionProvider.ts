@@ -15,10 +15,12 @@ export class CSSDefinitionProvider implements vscode.DefinitionProvider {
     private cache: Map<string, CSSDefinition[]> = new Map();
     private enabled: boolean = true;
     private debug: boolean = false;
+    private outputChannel: vscode.OutputChannel;
 
-    constructor() {
-        this.cssParser = new CSSParser();
-        this.fileUtils = new FileUtils();
+    constructor(outputChannel: vscode.OutputChannel) {
+        this.cssParser = new CSSParser(outputChannel);
+        this.fileUtils = new FileUtils(outputChannel);
+        this.outputChannel = outputChannel;
         this.updateConfiguration();
     }
 
@@ -26,12 +28,13 @@ export class CSSDefinitionProvider implements vscode.DefinitionProvider {
      * Update configuration from VS Code settings
      */
     public updateConfiguration(): void {
-        const config = vscode.workspace.getConfiguration('cssClassNavigator');
+        const config = vscode.workspace.getConfiguration('goToStyle');
         this.enabled = config.get('enabled', true);
         this.debug = config.get('debug', false);
 
         if (this.debug) {
-            console.log('CSS Class Navigator: Configuration updated', { enabled: this.enabled, debug: this.debug });
+            this.outputChannel.appendLine('CSS Definition Provider: Configuration updated');
+            this.outputChannel.appendLine(`Enabled: ${this.enabled}, Debug: ${this.debug}`);
         }
     }
 
@@ -41,7 +44,7 @@ export class CSSDefinitionProvider implements vscode.DefinitionProvider {
     public clearCache(): void {
         this.cache.clear();
         if (this.debug) {
-            console.log('CSS Class Navigator: Cache cleared');
+            this.outputChannel.appendLine('CSS Definition Provider: Cache cleared');
         }
     }
 
@@ -61,12 +64,12 @@ export class CSSDefinitionProvider implements vscode.DefinitionProvider {
         _token: vscode.CancellationToken
     ): Promise<vscode.Definition | undefined> {
         if (this.debug) {
-            console.log('CSS Class Navigator: provideDefinition called for', document.uri.fsPath, 'at position', position);
+            this.outputChannel.appendLine(`CSS Definition Provider: Request for ${document.uri.fsPath} at position ${position.line}:${position.character}`);
         }
 
         if (!this.enabled) {
             if (this.debug) {
-                console.log('CSS Class Navigator: Extension disabled');
+                this.outputChannel.appendLine('CSS Definition Provider: Extension disabled');
             }
             return undefined;
         }
@@ -75,31 +78,31 @@ export class CSSDefinitionProvider implements vscode.DefinitionProvider {
             const className = this.extractClassName(document, position);
             if (!className) {
                 if (this.debug) {
-                    console.log('CSS Class Navigator: No class name found at position');
+                    this.outputChannel.appendLine('CSS Definition Provider: No class name found at position');
                 }
                 return undefined;
             }
 
             if (this.debug) {
-                console.log('CSS Class Navigator: Looking for class:', className);
+                this.outputChannel.appendLine(`CSS Definition Provider: Looking for class: ${className}`);
             }
 
             const definitions = await this.findDefinitions(className, document);
 
             if (definitions.length === 0) {
                 if (this.debug) {
-                    console.log('CSS Class Navigator: No definitions found for:', className);
+                    this.outputChannel.appendLine(`CSS Definition Provider: No definitions found for: ${className}`);
                 }
                 return undefined;
             }
 
             if (this.debug) {
-                console.log('CSS Class Navigator: Found definitions:', definitions.length);
+                this.outputChannel.appendLine(`CSS Definition Provider: Found ${definitions.length} definitions`);
             }
 
             return definitions.map(def => def.location);
         } catch (error) {
-            console.error('CSS Class Navigator: Error providing definition:', error);
+            this.outputChannel.appendLine(`CSS Definition Provider: Error providing definition: ${error}`);
             return undefined;
         }
     }
@@ -112,7 +115,7 @@ export class CSSDefinitionProvider implements vscode.DefinitionProvider {
         const wordRange = document.getWordRangeAtPosition(position, /[a-zA-Z0-9_-]+/);
         if (!wordRange) {
             if (this.debug) {
-                console.log('CSS Class Navigator: No word range found');
+                this.outputChannel.appendLine('CSS Definition Provider: No word range found');
             }
             return undefined;
         }
@@ -121,7 +124,7 @@ export class CSSDefinitionProvider implements vscode.DefinitionProvider {
         const line = document.lineAt(position).text;
 
         if (this.debug) {
-            console.log('CSS Class Navigator: Word found:', word, 'Line:', line);
+            this.outputChannel.appendLine(`CSS Definition Provider: Word found: "${word}", Line: "${line}"`);
         }
 
         // Check if this looks like a CSS class based on context
@@ -130,7 +133,7 @@ export class CSSDefinitionProvider implements vscode.DefinitionProvider {
         }
 
         if (this.debug) {
-            console.log('CSS Class Navigator: Word not in class context');
+            this.outputChannel.appendLine('CSS Definition Provider: Word not in class context');
         }
         return undefined;
     }
@@ -147,7 +150,7 @@ export class CSSDefinitionProvider implements vscode.DefinitionProvider {
             line.substring(0, wordRange.start.character);
 
         if (this.debug) {
-            console.log('CSS Class Navigator: Context check - charBefore:', charBefore, 'charsBefore:', charsBefore);
+            this.outputChannel.appendLine(`CSS Definition Provider: Context check - charBefore: "${charBefore}", charsBefore: "${charsBefore}"`);
         }
 
         // CSS selector (when editing CSS files)
@@ -191,7 +194,7 @@ export class CSSDefinitionProvider implements vscode.DefinitionProvider {
 
         if (this.cache.has(cacheKey)) {
             if (this.debug) {
-                console.log('CSS Class Navigator: Using cached definitions for:', className);
+                this.outputChannel.appendLine(`CSS Definition Provider: Using cached definitions for: ${className}`);
             }
             return this.cache.get(cacheKey)!;
         }
@@ -200,7 +203,8 @@ export class CSSDefinitionProvider implements vscode.DefinitionProvider {
         const cssFiles = await this.findCSSFiles(document);
 
         if (this.debug) {
-            console.log('CSS Class Navigator: Found CSS files:', cssFiles.map(f => f.fsPath));
+            this.outputChannel.appendLine(`CSS Definition Provider: Found ${cssFiles.length} CSS files`);
+            cssFiles.forEach(file => this.outputChannel.appendLine(`  - ${file.fsPath}`));
         }
 
         for (const cssFile of cssFiles) {
@@ -210,11 +214,11 @@ export class CSSDefinitionProvider implements vscode.DefinitionProvider {
                 definitions.push(...cssDefinitions);
                 
                 if (this.debug && cssDefinitions.length > 0) {
-                    console.log('CSS Class Navigator: Found', cssDefinitions.length, 'definitions in', cssFile.fsPath);
+                    this.outputChannel.appendLine(`CSS Definition Provider: Found ${cssDefinitions.length} definitions in ${cssFile.fsPath}`);
                 }
             } catch (error) {
                 if (this.debug) {
-                    console.error('CSS Class Navigator: Error reading CSS file:', cssFile.fsPath, error);
+                    this.outputChannel.appendLine(`CSS Definition Provider: Error reading CSS file ${cssFile.fsPath}: ${error}`);
                 }
             }
         }
@@ -239,7 +243,7 @@ export class CSSDefinitionProvider implements vscode.DefinitionProvider {
         const files = await vscode.workspace.findFiles(cssGlob, '**/node_modules/**');
 
         if (this.debug) {
-            console.log('CSS Class Navigator: Found', files.length, 'CSS files in workspace');
+            this.outputChannel.appendLine(`CSS Definition Provider: Found ${files.length} CSS files in workspace`);
         }
 
         // Sort files by relevance
@@ -277,6 +281,10 @@ export class CSSDefinitionProvider implements vscode.DefinitionProvider {
             }
         }
 
+        if (this.debug && cssFiles.length > 0) {
+            this.outputChannel.appendLine(`CSS Definition Provider: Found ${cssFiles.length} linked CSS files`);
+        }
+
         return cssFiles;
     }
 
@@ -295,6 +303,10 @@ export class CSSDefinitionProvider implements vscode.DefinitionProvider {
             if (cssPath) {
                 cssFiles.push(cssPath);
             }
+        }
+
+        if (this.debug && cssFiles.length > 0) {
+            this.outputChannel.appendLine(`CSS Definition Provider: Found ${cssFiles.length} imported CSS files`);
         }
 
         return cssFiles;

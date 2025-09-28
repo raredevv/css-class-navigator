@@ -1,23 +1,35 @@
- 
-
-# Node modules
+# ------------------------
+# Node
+# ------------------------
 node_modules/
-
-# Compiled output
-out/
-dist/
-
-# VSCode config
-.vscode/
-
-# Logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-
-# Package locks (optional, if you don’t want lockfile in repo)
 package-lock.json
 yarn.lock
 
-# VSIX packaged extension
+# ------------------------
+# Build outputs
+# ------------------------
+out/
+dist/
 *.vsix
+
+# ------------------------
+# VS Code
+# ------------------------
+.vscode/*
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/tasks.json
+
+# ------------------------
+# OS junk
+# ------------------------
+.DS_Store
+Thumbs.db
+
+# ------------------------
+# Env/config (optional)
+# ------------------------
+.env

@@ -1,9 +1,10 @@
 {
-  "name": "go-to-style",
+  "name": "css-navigator",
   "displayName": "Go To Style (CSS Navigator)",
   "description": "Instantly jump to CSS class and ID definitions with Ctrl+Click from HTML, JS, JSX, Vue, and PHP files. Navigate internal <style> tags or linked stylesheets with ease.",
-  "version": "1.0.0",
-  "publisher": "raredev",
+  "version": "1.1.0",
+  "publisher": "raredevv",
+  "icon": "assets/icon.png",
   "engines": {
     "vscode": "^1.60.0"
   },
@@ -36,6 +37,21 @@
   ],
   "main": "./out/extension.js",
   "contributes": {
+    "commands": [
+      {
+        "command": "goToStyle.findDefinition",
+        "title": "Go to CSS Definition"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "when": "editorTextFocus && (resourceExtname == .html || resourceExtname == .js || resourceExtname == .jsx || resourceExtname == .ts || resourceExtname == .tsx || resourceExtname == .vue || resourceExtname == .php)",
+          "command": "goToStyle.findDefinition",
+          "group": "navigation@1"
+        }
+      ]
+    },
     "configuration": {
       "type": "object",
       "title": "Go To Style (CSS Navigator)",
@@ -48,23 +64,40 @@
         "goToStyle.debug": {
           "type": "boolean",
           "default": false,
-          "description": "Enable debug logging"
+          "description": "Enable debug logging for troubleshooting"
         },
         "goToStyle.searchInNodeModules": {
           "type": "boolean",
           "default": false,
-          "description": "Search for CSS classes in node_modules (useful for Tailwind CSS)"
+          "description": "Search for CSS classes in node_modules (useful for Tailwind CSS and framework libraries)"
         },
         "goToStyle.additionalSearchPaths": {
           "type": "array",
           "items": {
             "type": "string"
           },
-          "default": [ 
+          "default": [
             "**/dist/**/*.css",
             "**/build/**/*.css"
           ],
-          "description": "Additional paths to search for CSS files"
+          "description": "Additional file patterns to search for CSS files (supports glob patterns)"
+        },
+        "goToStyle.maxSearchResults": {
+          "type": "number",
+          "default": 100,
+          "minimum": 10,
+          "maximum": 500,
+          "description": "Maximum number of CSS files to search through"
+        },
+        "goToStyle.showStatusBarInfo": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show search results in the status bar"
+        },
+        "goToStyle.frameworkDetection": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable automatic framework detection (React, Vue, Angular) for better context matching"
         }
       }
     }
@@ -87,12 +120,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/raredev/go-to-style.git"
+    "url": "https://github.com/raredevv/css-class-navigator.git"
   },
   "license": "MIT",
-  "author": "RareDev",
+  "author": "raredevv",
   "bugs": {
-    "url": "https://github.com/raredev/go-to-style/issues"
+    "url": "https://github.com/raredevv/css-class-navigator/issues"
   },
-  "homepage": "https://rarevdev.com/stylesense"
+  "homepage": "https://github.com/raredevv/css-class-navigator"
 }

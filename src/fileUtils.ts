@@ -3,21 +3,43 @@ import * as path from 'path';
 import * as fs from 'fs';
 
 export class FileUtils {
+    private outputChannel: vscode.OutputChannel;
+    private debug: boolean = false;
+
+    constructor(outputChannel: vscode.OutputChannel) {
+        this.outputChannel = outputChannel;
+        this.updateConfiguration();
+    }
+
+    /**
+     * Update configuration from VS Code settings
+     */
+    public updateConfiguration(): void {
+        const config = vscode.workspace.getConfiguration('goToStyle');
+        this.debug = config.get('debug', false);
+    }
+
     /**
      * Resolve a relative path from a document URI
      */
     public resolveRelativePath(documentUri: vscode.Uri, relativePath: string): vscode.Uri | undefined {
         try {
             const documentDir = path.dirname(documentUri.fsPath);
-            console.log('Document dir:', documentDir);
             const resolvedPath = path.resolve(documentDir, relativePath);
-            console.log('Resolved path:', resolvedPath, 'Exists:', fs.existsSync(resolvedPath));
+            
+            if (this.debug) {
+                this.outputChannel.appendLine(`File Utils: Resolving path "${relativePath}" from "${documentDir}"`);
+                this.outputChannel.appendLine(`File Utils: Resolved to "${resolvedPath}", exists: ${fs.existsSync(resolvedPath)}`);
+            }
+            
             if (fs.existsSync(resolvedPath)) {
                 return vscode.Uri.file(resolvedPath);
             }
             return undefined;
         } catch (error) {
-            console.error('Error resolving path:', error);
+            if (this.debug) {
+                this.outputChannel.appendLine(`File Utils: Error resolving path "${relativePath}": ${error}`);
+            }
             return undefined;
         }
     }
@@ -42,12 +64,20 @@ export class FileUtils {
         const excludePattern = '**/node_modules/**';
 
         try {
-            return await vscode.workspace.findFiles(
+            const files = await vscode.workspace.findFiles(
                 new vscode.RelativePattern(workspaceFolder, cssGlob),
                 excludePattern
             );
+            
+            if (this.debug) {
+                this.outputChannel.appendLine(`File Utils: Found ${files.length} CSS files in workspace`);
+            }
+            
+            return files;
         } catch (error) {
-            console.error('Error finding CSS files:', error);
+            if (this.debug) {
+                this.outputChannel.appendLine(`File Utils: Error finding CSS files: ${error}`);
+            }
             return [];
         }
     }
@@ -79,7 +109,9 @@ export class FileUtils {
             const document = await vscode.workspace.openTextDocument(uri);
             return document.getText();
         } catch (error) {
-            console.error('Error reading file:', uri.fsPath, error);
+            if (this.debug) {
+                this.outputChannel.appendLine(`File Utils: Error reading file ${uri.fsPath}: ${error}`);
+            }
             return '';
         }
     }
@@ -130,6 +162,10 @@ export class FileUtils {
             }
         }
 
+        if (this.debug && imports.length > 0) {
+            this.outputChannel.appendLine(`File Utils: Found ${imports.length} CSS import statements`);
+        }
+
         return imports;
     }
 
@@ -146,6 +182,10 @@ export class FileUtils {
             if (this.isCSSFile(href)) {
                 links.push(href);
             }
+        }
+
+        if (this.debug && links.length > 0) {
+            this.outputChannel.appendLine(`File Utils: Found ${links.length} CSS link tags`);
         }
 
         return links;
@@ -208,7 +248,13 @@ export class FileUtils {
             'coverage'
         ];
 
-        return excludedDirs.some(dir => filePath.includes(path.sep + dir + path.sep));
+        const isExcluded = excludedDirs.some(dir => filePath.includes(path.sep + dir + path.sep));
+        
+        if (this.debug && isExcluded) {
+            this.outputChannel.appendLine(`File Utils: Excluding file in restricted directory: ${filePath}`);
+        }
+        
+        return isExcluded;
     }
 
     /**
@@ -231,11 +277,21 @@ export class FileUtils {
         const sourceDir = path.dirname(sourceDocument.uri.fsPath);
         const sourceName = this.getFileNameWithoutExtension(sourceDocument.uri.fsPath);
 
-        return files.sort((a, b) => {
+        const sortedFiles = files.sort((a, b) => {
             const scoreA = this.calculateRelevanceScore(a, sourceDir, sourceName);
             const scoreB = this.calculateRelevanceScore(b, sourceDir, sourceName);
             return scoreB - scoreA; // Higher scores first
         });
+
+        if (this.debug && sortedFiles.length > 0) {
+            this.outputChannel.appendLine(`File Utils: Sorted ${sortedFiles.length} files by relevance`);
+            sortedFiles.slice(0, 5).forEach((file, index) => {
+                const score = this.calculateRelevanceScore(file, sourceDir, sourceName);
+                this.outputChannel.appendLine(`  ${index + 1}. ${path.basename(file.fsPath)} (score: ${score})`);
+            });
+        }
+
+        return sortedFiles;
     }
 
     /**
@@ -247,24 +303,94 @@ export class FileUtils {
 
         let score = 0;
 
+        // Exact name match gets highest score
         if (cssName === sourceName) {
             score += 100;
         }
 
+        // Same directory gets high score
         if (cssDir === sourceDir) {
             score += 50;
         }
 
+        // Parent/child directory relationship
         if (sourceDir.startsWith(cssDir)) {
             const depth = sourceDir.replace(cssDir, '').split(path.sep).length - 1;
             score += Math.max(0, 30 - depth * 5);
         }
 
+        // Common naming patterns
         const commonNames = ['index', 'main', 'app', 'global', 'style', 'styles', 'base', 'common'];
         if (commonNames.includes(cssName.toLowerCase())) {
             score += 25;
         }
 
+        // Bonus for CSS modules
+        if (cssName.includes('.module') || cssName.includes('.component')) {
+            score += 15;
+        }
+
         return score;
+    }
+
+    /**
+     * Enhanced import detection with multiple patterns
+     */
+    public detectAllImports(content: string): string[] {
+        const imports: string[] = [];
+        
+        // Various import patterns
+        const patterns = [
+            // Standard ES6 imports
+            /import\s+['"`]([^'"`]+\.(?:css|scss|sass|less|styl))['"`]/gi,
+            // CSS imports
+            /@import\s+['"`]([^'"`]+\.(?:css|scss|sass|less|styl))['"`]/gi,
+            // Require statements
+            /require\s*\(\s*['"`]([^'"`]+\.(?:css|scss|sass|less|styl))['"`]\s*\)/gi,
+            // SCSS/SASS @use
+            /@use\s+['"`]([^'"`]+)['"`]/gi
+        ];
+
+        for (const pattern of patterns) {
+            let match;
+            while ((match = pattern.exec(content)) !== null) {
+                const importPath = match[1];
+                imports.push(importPath);
+            }
+        }
+
+        if (this.debug && imports.length > 0) {
+            this.outputChannel.appendLine(`File Utils: Detected ${imports.length} style imports`);
+        }
+
+        return [...new Set(imports)]; // Remove duplicates
+    }
+
+    /**
+     * Check if a file path exists with common extensions
+     */
+    public resolveWithExtensions(basePath: string, extensions: string[] = ['.css', '.scss', '.sass', '.less', '.styl']): string | undefined {
+        // Try exact path first
+        if (fs.existsSync(basePath)) {
+            return basePath;
+        }
+
+        // Try with extensions
+        for (const ext of extensions) {
+            const pathWithExt = basePath + ext;
+            if (fs.existsSync(pathWithExt)) {
+                return pathWithExt;
+            }
+        }
+
+        // Try index files
+        for (const ext of extensions) {
+            const indexPath = path.join(basePath, `index${ext}`);
+            if (fs.existsSync(indexPath)) {
+                return indexPath;
+            }
+        }
+
+        return undefined;
     }
 }
