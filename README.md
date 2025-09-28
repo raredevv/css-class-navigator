@@ -51,3 +51,7 @@ Unlock advanced features with **StyleSense Pro**:
   "**/dist/**/*.css",
   "**/build/**/*.css"
 ]
+
+
+## Demo
+![Demo](assets/demo.gif)
