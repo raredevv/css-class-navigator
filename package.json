@@ -1,0 +1,98 @@
+{
+  "name": "go-to-style",
+  "displayName": "Go To Style (CSS Navigator)",
+  "description": "Instantly jump to CSS class and ID definitions with Ctrl+Click from HTML, JS, JSX, Vue, and PHP files. Navigate internal <style> tags or linked stylesheets with ease.",
+  "version": "1.0.0",
+  "publisher": "raredev",
+  "engines": {
+    "vscode": "^1.60.0"
+  },
+  "categories": [
+    "Other",
+    "Programming Languages"
+  ],
+  "keywords": [
+    "css",
+    "navigation",
+    "go to definition",
+    "html",
+    "javascript",
+    "react",
+    "vue",
+    "tailwind",
+    "php",
+    "class",
+    "id",
+    "styles"
+  ],
+  "activationEvents": [
+    "onLanguage:html",
+    "onLanguage:javascript",
+    "onLanguage:javascriptreact",
+    "onLanguage:typescript",
+    "onLanguage:typescriptreact",
+    "onLanguage:vue",
+    "onLanguage:php"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "configuration": {
+      "type": "object",
+      "title": "Go To Style (CSS Navigator)",
+      "properties": {
+        "goToStyle.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable/disable Go To Style (CSS Navigator)"
+        },
+        "goToStyle.debug": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable debug logging"
+        },
+        "goToStyle.searchInNodeModules": {
+          "type": "boolean",
+          "default": false,
+          "description": "Search for CSS classes in node_modules (useful for Tailwind CSS)"
+        },
+        "goToStyle.additionalSearchPaths": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [ 
+            "**/dist/**/*.css",
+            "**/build/**/*.css"
+          ],
+          "description": "Additional paths to search for CSS files"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/node": "^24.5.2",
+    "@types/vscode": "^1.60.0",
+    "@typescript-eslint/eslint-plugin": "^8.44.1",
+    "@typescript-eslint/parser": "^8.44.1",
+    "eslint": "^9.36.0",
+    "typescript": "^5.9.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/raredev/go-to-style.git"
+  },
+  "license": "MIT",
+  "author": "RareDev",
+  "bugs": {
+    "url": "https://github.com/raredev/go-to-style/issues"
+  },
+  "homepage": "https://rarevdev.com/stylesense"
+}
