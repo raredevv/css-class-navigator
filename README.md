@@ -1,10 +1,11 @@
 # Go To Style (CSS Navigator - StyleSense)
 
-<p align="center">
-  <strong>Navigate your styles instantly.</strong> Jump directly from any class or id in your HTML, JS, JSX, Vue, or PHP files to its corresponding CSS definition with a simple <kbd>Ctrl+Click</kbd>.
+<p align="left">
+  <strong>Navigate your styles instantly.</strong> <br>
+  Jump directly from any class or id in your HTML, JS, JSX, Vue, or PHP files to its corresponding CSS definition with a simple <kbd>Ctrl+Click</kbd>.
 </p>
 
-<p align="center">
+<p align="left">
   Hover over classes/IDs to preview styles, and Pro users get advanced JavaScript navigation and global search.
 </p>
 
@@ -111,13 +112,7 @@ Direct access for bugs and feature requests via **StyleSense: Check License Stat
 2. **Navigate**: <kbd>Ctrl+Click</kbd> any CSS class or ID to jump to its definition
 3. **Preview**: Hover over classes/IDs (including in JS like `querySelector('.wrapper')`) to preview CSS rules
 4. **Search**: Use Command Palette (<kbd>Cmd+Shift+P</kbd>) for commands like **StyleSense: Search CSS Class or ID**
-5. **Pro Access**: For Pro features (once available), enter your license key via **StyleSense: Enter Pro License Key** (use `test-key` for local testing)
-
----
-
-## 📊 Demo
-
-> **Add demo GIF/video here**
+5. **Pro Access**: For Pro features (once available), enter your license key via **StyleSense: Enter Pro License Key**
 
 ---
 
@@ -221,7 +216,7 @@ Hover on `querySelector('.wrapper')` for CSS previews (free) or CSS + HTML previ
 <br>
 
 - Pro features will be available after the payment gateway is launched. Contact **augustinedevv@gmail.com** for updates or early access
-- For testing, use `test-key` via **StyleSense: Enter Pro License Key**
+
 
 </details>
 
