@@ -1,178 +1,116 @@
-# StyleSense (CSS Navigator)
+Go To Style (CSS Navigator)
+Navigate your styles instantly. Jump directly from any class or id in your HTML, JS, JSX, Vue, or PHP files to its corresponding CSS definition with a simple Ctrl+Click. Hover over classes/IDs to preview styles, and Pro users get advanced JavaScript navigation and global search.
 
-**Navigate your styles instantly.** Jump directly from any `class` or `id` in your HTML, JS, JSX, Vue, or PHP files to its corresponding CSS definition with a simple **Ctrl+Click**.
 
-[![VS Code Marketplace](https://img.shields.io/visual-studio-marketplace/v/raredevv.css-navigator)](https://marketplace.visualstudio.com/items?itemName=raredevv.css-navigator)
-[![Downloads](https://img.shields.io/visual-studio-marketplace/d/raredevv.css-navigator)](https://marketplace.visualstudio.com/items?itemName=raredevv.css-navigator)
-[![Rating](https://img.shields.io/visual-studio-marketplace/r/raredevv.css-navigator)](https://marketplace.visualstudio.com/items?itemName=raredevv.css-navigator)
+✨ Free Features
+🎯 Core Navigation
 
----
+Ctrl/Cmd + Click on any CSS class or ID → jump directly to definition
+Right-click context menu with "Go to Style" option (Cmd+Shift+G on macOS)
+Real-time status bar showing search progress
+Single file navigation - instant jump when class appears once
+Hover Style Previews - Hover over a class/ID (including in querySelector, getElementById, etc.) to see its full CSS rule in a popup
 
-## ✨ Free Features
+🛠 Framework Support
 
-### 🎯 **Instant Navigation**
-- **Ctrl/Cmd + Click** on any CSS class or ID → jump directly to definition
-- **Right-click context menu** with "Go to CSS Definition" option
-- **Real-time status bar** showing search progress and results
+React/JSX: className="header" ✅
+Vue.js: :class="'nav'" ✅  
+Angular: [class]="'sidebar'" ✅
+HTML/PHP: class="content" ✅
+JavaScript: querySelector('.wrapper') ✅ (CSS preview on hover)
 
-### 🛠 **Multi-Framework Support**
-- **React/JSX**: `className="header-nav"` ← Works perfectly
-- **Vue.js**: `:class="'nav-item'"` ← Vue binding support  
-- **Angular**: `[class]="'sidebar'"` ← Angular bindings
-- **HTML/PHP**: `class="content"` ← Standard support
+📂 Smart Detection
 
-### 📂 **Smart File Detection**
-- Automatically finds linked CSS files (`<link href="...">`)
-- Detects CSS imports (`import './style.css'`)
-- Searches inline `<style>` tags
-- Configurable search paths for build directories
+Linked CSS files (<link href="...">)
+CSS imports (import './style.css')
+Inline <style> tags
+Build directories (dist/, build/)
 
----
 
-## 🚀 StyleSense Pro (Premium)
+🚀 Pro Features
+✅ Available Now
 
-Unlock advanced productivity features:
+Multi-file QuickPick - Choose from multiple CSS matches with file paths and line numbers
+JavaScript Navigation - Ctrl+Click on querySelector, getElementById, classList.add, etc., to choose between HTML element usage (e.g., <div class="wrapper">) or CSS style definition. Works in <script> tags or .js files
+JavaScript Hover Previews - Hover over querySelector('.wrapper') to see CSS rules and HTML element usage (up to 3 lines)
+Framework CSS Support - Search in Tailwind CSS and Bootstrap files (enable goToStyle.searchInNodeModules in settings)
+Global CSS Search - Search for .classname or #idname via Command Palette (Cmd+Shift+C on macOS) and jump to definitions
+Priority Support - Direct access for bugs and feature requests via StyleSense: Check License Status
 
-### 🎯 **Advanced Navigation**
-- **Multi-file QuickPick** - Choose from multiple matches with code previews
-- **CSS Variable Navigation** - Jump to `var(--primary-color)` definitions  
-- **SCSS/SASS Mixins** - Navigate to `@mixin` and `@function` definitions
-- **Hover Previews** - See styles without leaving your file
+🔜 Coming Soon
 
-### ⚡ **Performance & Scale**
-- **Optimized Indexing** - Lightning fast search in large projects
-- **Multi-root Workspace** - Perfect for monorepos and micro-frontends
-- **Smart Caching** - Reduces search time by 70%
+CSS Variable Navigation - Jump to var(--color) definitions (In Development)
+SCSS/SASS Mixins - Navigate to @mixin definitions (Planned)
+Tailwind Docs Integration - Link directly to Tailwind documentation (Planned)
+Team Workspace Config - Shared settings for teams (Planned)
 
-### 🎨 **Framework Intelligence**  
-- **Tailwind CSS Integration** - Jump to docs or config instead of CSS
-- **CSS-in-JS Navigation** - Styled-components and emotion support
-- **Bootstrap/Framework Detection** - Smart handling of utility classes
+Get Pro License → - One-time payment, lifetime updates
 
-### 👥 **Team Features**
-- **Workspace Configuration** - Share team settings and search rules
-- **Custom Search Patterns** - Define project-specific CSS locations
-- **Priority Support** - Direct access for bug reports and feature requests
+⚡ Quick Start
 
-**[Get StyleSense Pro →](https://gumroad.com/l/stylesense-pro)**
+Install from VS Code Marketplace
+Ctrl+Click any CSS class or ID to jump to its definition
+Hover over classes/IDs (including in JS like querySelector('.wrapper')) to preview CSS rules
+Use Command Palette (Cmd+Shift+P) for commands like StyleSense: Search CSS Class or ID
+For Pro features, enter your license key via StyleSense: Enter Pro License Key (use test-key for local testing)
 
----
 
-## ⚡ Quick Start
+📊 Demo
 
-### Installation
-1. Install from [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=raredevv.css-navigator)
-2. **Ctrl+Click** any CSS class or ID
-3. Jump instantly to its definition 🎉
 
-### Basic Usage
-```html
-<!-- Ctrl+Click on any class -->
-<div class="header-nav">...</div>
-<div id="main-content">...</div>
-```
-
-```jsx  
-// Works in React too
-<button className="btn-primary">Click me</button>
-```
-
----
-
-## ⚙️ Configuration
-
-```jsonc
+⚙️ Configuration
+Customize or disable features via VS Code settings (Cmd+, on macOS). Any feature can be turned off by setting goToStyle.enabled to false or adjusting specific settings below.
 {
-  "goToStyle.enabled": true,
-  "goToStyle.debug": false, 
-  "goToStyle.searchInNodeModules": false,
-  "goToStyle.additionalSearchPaths": [
+  "goToStyle.enabled": true, // Disable to turn off all StyleSense features
+  "goToStyle.debug": false, // Enable for detailed logs in Output > StyleSense (CSS Navigator)
+  "goToStyle.searchInNodeModules": false, // Pro: Enable for Tailwind/Bootstrap in node_modules
+  "goToStyle.additionalSearchPaths": [ // Add paths for Tailwind output or custom CSS
     "**/dist/**/*.css",
-    "**/build/**/*.css"
+    "**/build/**/*.css",
+    "**/output.css",
+    "**/styles.css"
   ],
-  "goToStyle.maxSearchResults": 100
+  "goToStyle.maxSearchResults": 100, // Limit CSS files searched for performance
+  "goToStyle.showStatusBarInfo": true, // Show search progress in status bar
+  "goToStyle.frameworkDetection": true // Enable React/Vue/Angular detection
 }
-```
 
----
+🛠 Enabling Key Features
 
-## 📊 Demo
+Global CSS Search: Use Cmd+Shift+C or StyleSense: Search CSS Class or ID in Command Palette. Ensure goToStyle.additionalSearchPaths includes your CSS files (e.g., Tailwind's output.css).
+Tailwind/Bootstrap Support: Set goToStyle.searchInNodeModules to true for Pro users to search framework CSS in node_modules.
+JavaScript Navigation: Ctrl+Click on querySelector('.wrapper') or getElementById('main') to choose between HTML element or CSS definition (Pro-only). Works in <script> tags or .js files.
+JavaScript Hover Previews: Hover on querySelector('.wrapper') for CSS previews (free) or CSS + HTML previews (Pro).
 
-![StyleSense Demo](assets/demo.gif)
+🎹 Keybindings
 
-*Jump from HTML to CSS instantly with Ctrl+Click*
+Cmd+Shift+C: Open global CSS search (StyleSense: Search CSS Class or ID)
+Cmd+Shift+G: Go to Style (StyleSense: Go to Style)
+Cmd+Shift+L: Check license status (StyleSense: Check License Status)
 
----
+Customize keybindings in Preferences: Open Keyboard Shortcuts (JSON).
 
-## 💖 Support This Project
+🐞 Troubleshooting
 
-StyleSense is developed by an independent developer. Your support helps fund new features and improvements!
+Tailwind Classes Not Found?
+Ensure goToStyle.searchInNodeModules is true (Pro-only).
+Add your Tailwind output file (e.g., output.css) to goToStyle.additionalSearchPaths.
+Run npx tailwindcss -i ./src/input.css -o ./src/output.css to generate CSS.
+Enable goToStyle.debug and check Output channel for searched files.
 
-### 🎯 Ways to Support:
 
-[![GitHub Sponsors](https://img.shields.io/badge/GitHub-Sponsors-ff69b4?logo=github)](https://github.com/sponsors/raredevv)
-[![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-Support-orange?logo=buy-me-a-coffee)](https://buymeacoffee.com/raredevv)
-[![PayPal](https://img.shields.io/badge/PayPal-Donate-blue?logo=paypal)](https://paypal.me/raredevv)
+JS Navigation or Hover Not Working?
+Ensure the pattern matches (e.g., querySelector('.wrapper') or getElementById('main')).
+For <script> tags in HTML, the extension detects JS context but treats the file as HTML.
+Enable goToStyle.debug to log context detection and searched files (e.g., "Searching for class: wrapper (JS Context: true)").
+Check if CSS/HTML files are in goToStyle.additionalSearchPaths.
 
-### 🚀 Premium License
-**[Get StyleSense Pro](https://gumroad.com/l/stylesense-pro)** - Unlock all advanced features + support development
 
-### 📧 Contact
-- **Email**: devpromise234@gmail.com
-- **GitHub**: [@raredevv](https://github.com/raredevv)
-- **Issues**: [Report bugs or request features](https://github.com/raredevv/css-navigator-public/issues)
+Pro Features Not Working?
+Verify Pro status: Cmd+Shift+P > StyleSense: Check License Status.
+Re-enter key via StyleSense: Enter Pro License Key (use test-key for testing).
 
----
 
-## 🎯 Why StyleSense?
+Disable Unwanted Features: Set goToStyle.enabled to false or adjust specific settings (e.g., goToStyle.showStatusBarInfo to false for status bar).
 
-| Problem | Before StyleSense | With StyleSense |
-|---------|------------------|-----------------|
-| Finding CSS class | Manual search across files | **Ctrl+Click** |
-| Multiple CSS files | Hunt through each one | **QuickPick menu** (Pro) |
-| Large projects | Slow, manual process | **Instant navigation** |
-| Framework complexity | Different syntax confusion | **Auto-detection** |
-
-**Stop hunting for CSS. Start navigating instantly.**
-
----
-
-## 📈 Roadmap
-
-- [ ] CSS-in-JS full support (styled-components, emotion)
-- [ ] Tailwind CSS documentation links  
-- [ ] SCSS/SASS variable navigation
-- [ ] Live style preview on hover
-- [ ] Workspace-wide CSS class search
-- [ ] Team collaboration features
-
----
-
-## 🤝 Contributing
-
-Love StyleSense? Here's how you can help:
-
-1. **⭐ Star this repo** - Show your support
-2. **🐛 Report bugs** - Help us improve
-3. **💡 Suggest features** - Shape the roadmap  
-4. **💰 Sponsor development** - Fund new features
-5. **📢 Spread the word** - Tell other developers
-
----
-
-## 📄 License
-
-**StyleSense Core (Free)**: MIT License  
-**StyleSense Pro (Premium)**: Commercial License
-
----
-
-<div align="center">
-
-**Made with ❤️ by [RareDevv](https://github.com/raredevv)**
-
-*Transform your CSS workflow from manual hunting to instant navigation*
-
-[![Support on GitHub](https://img.shields.io/badge/Support-GitHub%20Sponsors-ff69b4?logo=github)](https://github.com/sponsors/raredevv)
-
-</div>
+File issues at GitHub.

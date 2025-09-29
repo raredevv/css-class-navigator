@@ -1,7 +1,7 @@
 {
   "name": "css-navigator",
-  "displayName": "Go To Style (CSS Navigator)",
-  "description": "Instantly jump to CSS class and ID definitions with Ctrl+Click from HTML, JS, JSX, Vue, and PHP files. Navigate internal <style> tags or linked stylesheets with ease.",
+  "displayName": "Go To Style (CSS Navigator - StyleSense)",
+  "description": "Instantly jump to CSS class and ID definitions with Ctrl+Click. Pro version includes multi-file QuickPick, JS navigation, global search, and advanced features.",
   "version": "1.1.0",
   "publisher": "raredevv",
   "icon": "assets/icon.png",
@@ -24,7 +24,9 @@
     "php",
     "class",
     "id",
-    "styles"
+    "styles",
+    "premium",
+    "pro"
   ],
   "activationEvents": [
     "onLanguage:html",
@@ -33,33 +35,95 @@
     "onLanguage:typescript",
     "onLanguage:typescriptreact",
     "onLanguage:vue",
-    "onLanguage:php"
+    "onLanguage:php",
+    "onCommand:stylesense.findDefinition",
+    "onCommand:stylesense.enterLicense",
+    "onCommand:stylesense.upgrade",
+    "onCommand:stylesense.checkLicense",
+    "onCommand:stylesense.searchCSS"
   ],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "goToStyle.findDefinition",
-        "title": "Go to CSS Definition"
+        "command": "stylesense.findDefinition",
+        "title": "Go to Style"
+      },
+      {
+        "command": "stylesense.enterLicense",
+        "title": "StyleSense: Enter Pro License Key"
+      },
+      {
+        "command": "stylesense.upgrade",
+        "title": "StyleSense: Upgrade to Pro"
+      },
+      {
+        "command": "stylesense.checkLicense",
+        "title": "StyleSense: Check License Status"
+      },
+      {
+        "command": "stylesense.searchCSS",
+        "title": "StyleSense: Search CSS Class or ID"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "stylesense.searchCSS",
+        "key": "cmd+shift+c",
+        "mac": "cmd+shift+c",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "stylesense.findDefinition",
+        "key": "cmd+shift+g",
+        "mac": "cmd+shift+g",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "stylesense.checkLicense",
+        "key": "cmd+shift+l",
+        "mac": "cmd+shift+l"
       }
     ],
     "menus": {
       "editor/context": [
         {
           "when": "editorTextFocus && (resourceExtname == .html || resourceExtname == .js || resourceExtname == .jsx || resourceExtname == .ts || resourceExtname == .tsx || resourceExtname == .vue || resourceExtname == .php)",
-          "command": "goToStyle.findDefinition",
+          "command": "stylesense.findDefinition",
           "group": "navigation@1"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "stylesense.findDefinition",
+          "when": "editorTextFocus"
+        },
+        {
+          "command": "stylesense.enterLicense",
+          "title": "StyleSense: Enter Pro License Key"
+        },
+        {
+          "command": "stylesense.upgrade",
+          "title": "StyleSense: Upgrade to Pro"
+        },
+        {
+          "command": "stylesense.checkLicense",
+          "title": "StyleSense: Check License Status"
+        },
+        {
+          "command": "stylesense.searchCSS",
+          "title": "StyleSense: Search CSS Class or ID"
         }
       ]
     },
     "configuration": {
       "type": "object",
-      "title": "Go To Style (CSS Navigator)",
+      "title": "StyleSense (CSS Navigator)",
       "properties": {
         "goToStyle.enabled": {
           "type": "boolean",
           "default": true,
-          "description": "Enable/disable Go To Style (CSS Navigator)"
+          "description": "Enable/disable StyleSense CSS Navigator"
         },
         "goToStyle.debug": {
           "type": "boolean",
@@ -69,7 +133,7 @@
         "goToStyle.searchInNodeModules": {
           "type": "boolean",
           "default": false,
-          "description": "Search for CSS classes in node_modules (useful for Tailwind CSS and framework libraries)"
+          "markdownDescription": "Search for CSS classes in node_modules (useful for Tailwind CSS and framework libraries). **Pro feature**"
         },
         "goToStyle.additionalSearchPaths": {
           "type": "array",
@@ -78,7 +142,9 @@
           },
           "default": [
             "**/dist/**/*.css",
-            "**/build/**/*.css"
+            "**/build/**/*.css",
+            "**/output.css",
+            "**/styles.css"
           ],
           "description": "Additional file patterns to search for CSS files (supports glob patterns)"
         },
@@ -87,12 +153,12 @@
           "default": 100,
           "minimum": 10,
           "maximum": 500,
-          "description": "Maximum number of CSS files to search through"
+          "description": "Maximum number of CSS files to search through for performance"
         },
         "goToStyle.showStatusBarInfo": {
           "type": "boolean",
           "default": true,
-          "description": "Show search results in the status bar"
+          "description": "Show search results and progress in the status bar"
         },
         "goToStyle.frameworkDetection": {
           "type": "boolean",
@@ -120,12 +186,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/raredevv/css-class-navigator.git"
+    "url": "https://github.com/raredevv/css-navigator.git"
   },
   "license": "MIT",
   "author": "raredevv",
   "bugs": {
-    "url": "https://github.com/raredevv/css-class-navigator/issues"
+    "url": "https://github.com/raredevv/css-navigator/issues"
   },
-  "homepage": "https://github.com/raredevv/css-class-navigator"
+  "homepage": "https://github.com/raredevv/css-navigator"
 }
